@@ -1,6 +1,8 @@
 package com.example.calculadoraohms.items
 
+import android.R.attr.text
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -59,34 +61,64 @@ fun CalculadoraOHM() {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        contentAlignment = Alignment.Center
+
+        contentAlignment = Alignment.TopCenter
     ) {
         Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text("Calculadora de Resistencia", style = MaterialTheme.typography.titleLarge)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFFEADCA5)
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
 
-                Divider(modifier = Modifier.padding(vertical = 8.dp))
+
+        ) {
+            Column(modifier = Modifier.padding(16.dp) ) {
+                Text(
+                    "Calculadora de Código de Colores",
+                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                    color = Color(0xFF1565C0),
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                Divider(color = Color(0xFF032617), thickness = 1.dp)
 
                 DropdownSelectorSimple("Banda 1", colores, banda1) { banda1 = it }
                 DropdownSelectorSimple("Banda 2", colores, banda2) { banda2 = it }
                 DropdownSelectorSimple("Multiplicador", multiplicadores, banda3) { banda3 = it }
                 DropdownSelectorSimple("Tolerancia", tolerancias, tolerancia) { tolerancia = it }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    BandaColor(banda1)
+                    BandaColor(banda2)
+                    BandaColor(banda3)
+                    BandaColor(tolerancia)
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("Resultado ->")
                 Text(
-                    "Resultado:",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-                Text(
+
                     text = resultado,
-                    style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary)
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF22577A)
+                    )
                 )
+
             }
         }
     }
@@ -101,29 +133,85 @@ fun DropdownSelectorSimple(
 ) {
     var expandido by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+    Column(modifier = Modifier.padding(vertical = 8.dp )) {
         Text(label, style = MaterialTheme.typography.labelLarge)
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
-                .clickable { expandido = true }
-                .padding(12.dp)
-        ) {
-            Text(seleccionado)
-        }
-        DropdownMenu(expanded = expandido, onDismissRequest = { expandido = false }) {
-            opciones.forEach { opcion ->
-                DropdownMenuItem(
-                    text = { Text(opcion) },
-                    onClick = {
-                        onSeleccionado(opcion)
-                        expandido = false
-                    }
+
+        Box {
+            OutlinedTextField(
+                value = seleccionado,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text(label) },
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = "Desplegar"
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expandido = true },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFF57CC99),
+                    unfocusedBorderColor = Color(0xFFB5EAEA),
+                    cursorColor = Color(0xFF38A3A5),
+                    focusedLabelColor = Color(0xFF22577A)
                 )
+            )
+
+            DropdownMenu(
+                expanded = expandido,
+                onDismissRequest = { expandido = false },
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                opciones.forEach { opcion ->
+                    DropdownMenuItem(
+                        text = { Text(opcion) },
+                        onClick = {
+                            onSeleccionado(opcion)
+                            expandido = false
+                        }
+                    )
+
+                }
+
             }
+            Box(modifier = Modifier
+                .matchParentSize()
+                .clickable { expandido = true }
+            )
         }
     }
+}
+
+
+
+
+@Composable
+fun BandaColor(color: String) {
+    val colorMap = mapOf(
+        "Negro" to Color.Black,
+        "Marrón" to Color(0xFF8B4513),
+        "Rojo" to Color.Red,
+        "Naranja" to Color(0xFFFFA500),
+        "Amarillo" to Color.Yellow,
+        "Verde" to Color.Green,
+        "Azul" to Color.Blue,
+        "Violeta" to Color(0xFF8A2BE2),
+        "Gris" to Color.Gray,
+        "Blanco" to Color.White,
+        "Dorado" to Color(0xFFFFD700),
+        "Plateado" to Color.LightGray,
+        "Ninguno" to Color.Transparent
+    )
+
+    Box(
+        modifier = Modifier
+            .size(width = 24.dp, height = 40.dp)
+            .background(colorMap[color] ?: Color.Transparent, shape = RoundedCornerShape(4.dp))
+            .border(1.dp, Color.Black, shape = RoundedCornerShape(4.dp))
+    )
 }
 
 fun calcularResistenciaSimple(b1: String, b2: String, b3: String, tol: String): String {
@@ -133,18 +221,12 @@ fun calcularResistenciaSimple(b1: String, b2: String, b3: String, tol: String): 
     )
 
     val multiplicador = mapOf(
-        "Amarillo" to 10000.0,
-        "Verde" to 100000.0,
-        "Azul" to 1000000.0,
-        "Violeta" to 10000000.0,
-        "Gris" to 100000000.0,
-        "Blanco" to 1000000000.0
+        "Amarillo" to 1e4, "Verde" to 1e5, "Azul" to 1e6,
+        "Violeta" to 1e7, "Gris" to 1e8, "Blanco" to 1e9
     )
 
     val toleranciaTexto = mapOf(
-        "Dorado" to "±5%",
-        "Plateado" to "±10%",
-        "Ninguno" to "±20%"
+        "Dorado" to "±5%", "Plateado" to "±10%", "Ninguno" to "±20%"
     )
 
     val num1 = valores[b1] ?: 0
@@ -154,5 +236,7 @@ fun calcularResistenciaSimple(b1: String, b2: String, b3: String, tol: String): 
 
 
 
-    return "${toleranciaTexto[tol]}"
+
+    return " ${resistencia} ${toleranciaTexto[tol]}"
 }
+
